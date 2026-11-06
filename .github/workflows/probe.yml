@@ -1,0 +1,22 @@
+name: probe
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [".github/workflows/probe.yml", "trigger-probe.txt"]
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  show:
+    runs-on: ubuntu-latest
+    steps:
+      - name: refs
+        env:
+          WREF: ${{ github.workflow_ref }}
+        run: |
+          echo "GITHUB_WORKFLOW_REF=$GITHUB_WORKFLOW_REF"
+          echo "github.workflow_ref=$WREF"
+          echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
+          tok=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=probe" | jq -r .value)
+          echo "$tok" | cut -d. -f2 | tr '_-' '/+' | base64 -d 2>/dev/null | jq -c '{job_workflow_ref,repository,workflow_ref}' || true
