@@ -1,0 +1,14 @@
+name: late
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  wait:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "GITHUB_WORKFLOW_REF=$GITHUB_WORKFLOW_REF"; sleep 75
+  after:
+    needs: wait
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "GITHUB_WORKFLOW_REF=$GITHUB_WORKFLOW_REF"; echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
